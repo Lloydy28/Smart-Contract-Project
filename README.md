@@ -5,24 +5,53 @@ For this project, write a smart contract that implements the require(), assert()
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Cresent {
-    uint256 public value;
+contract BankAcc {
+    address public holder;
+    mapping(address => uint) public balances;
 
-    function setValue(uint256 _newValue) external {
+    event Deposit(address indexed shipper, uint amount);
+    event Withdraw(address indexed receiver, uint amount);
+    
+    modifier onlyOwner() {
+        require(msg.sender == holder, "Not the holder");
+        _;
+    }
+    
+    constructor() {
+        holder = msg.sender;
+    }
+    
+    function deposit() public payable {
+        require(msg.value > 0, "Deposit must be above 100");
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+    
+    function withdraw(uint amount) public {
+        require(amount > 0, "Withdraw amount must be greater than 100");
+        require(balances[msg.sender] >= amount, "Insufficient Money");
         
-        require(_newValue != 2, "New value cannot be zero");
+        balances[msg.sender] -= amount;
+        payable(msg.sender).transfer(amount);
         
+        emit Withdraw(msg.sender, amount);
+    }
+    
+    function emergencyWithdraw() public onlyOwner {
+        uint contractBalance = address(this).balance;
         
-        assert(_newValue != 20); 
+        assert(contractBalance >= 0);
         
+        payable(holder).transfer(contractBalance);
         
-        if (_newValue == 10) {
-            revert("New value cannot be 5");
+        if (address(this).balance != 0) {
+            revert(" Failed Withdrawal");
         }
-
-        value = _newValue;
     }
 }
+   
+        
+
 
 # Author
 NTC
