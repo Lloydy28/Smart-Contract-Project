@@ -5,28 +5,33 @@ For this project, write a smart contract that implements the require(), assert()
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract GymRat {
- 
-    function squatreps(uint reps) public pure {
-
-        require(reps >= 10, "Not Enough Reps for squats");
-        
+contract Restaurant {
+    struct Menu 
+    {        
+      string food;
+      uint256 value;
     }
 
-    function benchpressreps(uint reps) public pure {
-        
+    Menu[] public foods;
 
-        if (reps <=12){
-          revert("Not enought Reps for benchpress");
+    function foodsmenu(string memory _food, uint256 _value) public {
+        require(_value >= 1000, "Price must be less or equal to 1000");
+
+        foods.push(Menu(_food, _value));
+    }
+
+    function totalmenu(uint256 _value) pure  public {
+        if (_value <=100) {
+          revert("Price must be less than or equal to 100");
         }
-        
     }
 
-    function Deadliftreps(uint reps) public pure 
-     {
-        assert(reps >=6);
+    function valuemenu(uint256 _value) public pure  {
+        assert(_value > 100);
+
     }
 }
+
 
         
 
